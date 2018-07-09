@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Test Spacebrew message types!</title>
+
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/reset.css" type="text/css" media="screen" charset="utf-8" />
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen" charset="utf-8" />
+
+    <script type="text/javascript" src="js/sb-1.4.2.js"></script>
+    <script type="text/javascript">
+
+        window.onload = function () {
+            setup();
+        }
+
+        // Spacebrew Object
+        var sb,
+            app_name = "types example";
+
+		/**
+	     * setup Configure spacebrew connection and adds the mousedown listener.
+	     */
+        function setup() {
+            // we make a random name, which allows you connect more than one
+            // of this example from the same computer
+            // passing the "name" argument in a query string overrides this!
+            var random_id = "0000" + Math.floor(Math.random() * 10000);
+
+            app_name = app_name + ' ' + random_id.substring(random_id.length - 4);
+
+            // create spacebrew client object
+            sb = new Spacebrew.Client({ reconnect: true });
+
+            // set the base description
+            sb.name(app_name);
+            sb.description("This spacebrew client sends and receives messages.");
+
+            // configure the publication and subscription feeds
+            sb.addPublish("SendBoolean", "boolean", "false");
+            sb.addPublish("SendString", "string", "default");
+            sb.addPublish("SendRange", "range", "0");
+
+            //these subscriptions don't actually have handlers
+            sb.addSubscribe("GetBoolean", "boolean");
+            sb.addSubscribe("GetString", "string");
+            sb.addSubscribe("GetRange", "range");
+
+            // override Spacebrew events - this is how you catch events coming from Spacebrew
+            // sb.onBooleanMessage = onBooleanMessage;
+            sb.onOpen = onOpen;
+
+            // connect to spacbrew
+            sb.connect();
+
+            // listen to the mouse 
+            var booleanButton = document.getElementById("booleanMsg");
+                booleanButton.addEventListener("mouseup", onBooleanPress);
+                booleanButton.addEventListener("mousedown", onBooleanRelease);
+                booleanButton.addEventListener("touchstart", onBooleanPress);
+                booleanButton.addEventListener("touchend", onBooleanRelease);
+            var stringButton = document.getElementById("stringMsg");
+                stringButton.addEventListener("mouseup", onStringPress);
+                stringButton.addEventListener("mousedown", onStringRelease);
+                stringButton.addEventListener("touchstart", onStringPress);
+                stringButton.addEventListener("touchend", onStringRelease);
+            var rangeButton = document.getElementById("rangeMsg");
+                rangeButton.addEventListener("mouseup", onRangePress);
+                rangeButton.addEventListener("mousedown", onRangeRelease);
+                rangeButton.addEventListener("touchstart", onRangePress);
+                rangeButton.addEventListener("touchend", onRangeRelease);
+        }
+
+		/**
+		 * Function that is called when Spacebrew connection is established
+		 */
+        function onOpen() {
+            var message = "Connected as <strong>" + sb.name() + "</strong>. ";
+            if (sb.name() === app_name) {
+                message += "<br>You can customize this app's name in the query string <br>by adding <strong>name=your_app_name</strong>."
+            }
+            var nameElement = document.getElementById("name");
+            nameElement.innerHTML = message;
+        }
+
+        function onBooleanPress(evt) { 
+            evt.preventDefault();
+            sb.send("SendBoolean", "boolean", "true");
+        }
+        function onBooleanRelease(evt) {
+            evt.preventDefault();
+            sb.send("SendBoolean", "boolean", "false");
+        }
+        function onStringPress(evt) {
+            evt.preventDefault();
+            sb.send("SendString", "string", "Hello");
+        }
+        function onStringRelease(evt) {
+            evt.preventDefault();
+            sb.send("SendString", "string", "World");
+        }
+        function onRangePress(evt) {
+            evt.preventDefault();
+            sb.send("SendRange", "range", "0");
+        }
+        function onRangeRelease(evt) {
+            evt.preventDefault();
+            sb.send("SendRange", "range", "100");
+        }
+
+        // function onBooleanMessage(name, value) {
+        //     console.log("[onBooleanMessage] boolean message received ", value);
+        //     if (value) {
+        //         document.body.style.background = "rgb(100,255,100)";
+        //     } else {
+        //         document.body.style.background = "rgb(220,220,220)";
+        //     }
+        // }
+
+    </script>
+</head>
+
+<body>
+    <div id="container">
+        <h1>Click to send a message
+            <br/>to Spacebrew</h1>
+        <a class="button" id="booleanMsg">Send Boolean</a>
+        <a class="button" id="stringMsg">Send String</a>
+        <a class="button" id="rangeMsg">Send Range</a>
+
+        </br>
+        </br>
+        <div id="name">Trying to connect</div>
+    </div>
+</body>
+
+</html>
