@@ -33,8 +33,23 @@ Running the Example
 - Run the SimpleTester html file to have an example client to send data from
     - Be sure to include url query strings `?server=localhost&name=tester`
     - You should see the tester connect in the [Spacebrew admin](http://localhost:9000)
-- Then open up SimpleExample/SimpleSpacebrew.toe
+- Then open up SimpleExample/SimpleSpacebrew.toe.
 
 ![Alt text](/screenshots/overview.png "TouchDesigner Example")
+- This example contains the Spacebrew operator `spacebrew` which handles configuring, publishing and subscribing Spacebrew messages. It also contains nodes for sending and receiving messages.
+- Click the `Toggle Spacebrew` button to toggle the connection to Spacebrew. When the button is green the app will connect.
+- Once the App is connected you should be able to open the Spacebrew admin and wire the app to the tester client. The app example subscribes and publishes to one of each type (boolean, string, range), but the example only publishes the string type. Clicking the Send Message button will publish a `Hello World` string.
+- Subscriptions
 
+Configuring Overview
+==============
+Most of the work happens in the `spacebrew` operator
 ![Alt text](/screenshots/spacebrew_tox.png "Spacebrew Tox")
+- Spacebrew Python runs in separate thread
+    - Touchdesigner operators cannot interact directly with external threads
+- Spacebrew messages are passed in and out using Queues
+    - Subscribe messages get placed inside tables `spacebrewOutput`
+    - Publish messages should get placed into `spacebrewInput`
+    - Once table values are parsed the tables are cleared
+- Configuration values are set and accessed inside the `spacebrew` operator using store and fetch
+    - Modify the `configureSpacebrew` method in `SpacebrewConfig_execute` to update the configuration (change server IP, change Publishers or Subscribers)
